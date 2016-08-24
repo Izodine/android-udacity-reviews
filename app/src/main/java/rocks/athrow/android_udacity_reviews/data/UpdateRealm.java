@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
-
 import java.util.Date;
 
 import io.realm.Realm;
@@ -33,10 +32,8 @@ public class UpdateRealm {
      * @param reviews an array of ContentValues built from the JSONParser
      */
     public void updateReviews(ContentValues[] reviews) {
-        int reviewsCount = reviews.length;
-        Log.e("updateReviews Qty ", "" + reviewsCount);
         for (ContentValues value : reviews) {
-            //Log.e("value ","" + value.size());
+            Log.e("value ", "" + value);
             int findId = value.getAsInteger("id");
             RealmConfiguration realmConfig = new RealmConfiguration.Builder(mContext).build();
             Realm.setDefaultConfiguration(realmConfig);
@@ -78,10 +75,12 @@ public class UpdateRealm {
                 Date updated_at = Utilities.getStringAsDate(value.getAsString("updated_at"), DATE_UTC, TIMEZONE_UTC);
                 Date assigned_at = Utilities.getStringAsDate(value.getAsString("assigned_at"), DATE_UTC, TIMEZONE_UTC);
                 Date completed_at = Utilities.getStringAsDate(value.getAsString("completed_at"),DATE_UTC, TIMEZONE_UTC);
+                long elapsed_time = Utilities.elapsedMilliseconds(assigned_at, completed_at);
                 newReview.setCreated_at(created_at);
                 newReview.setUpdated_at(updated_at);
                 newReview.setAssigned_at(assigned_at);
                 newReview.setCompleted_at(completed_at);
+                newReview.setElapsed_time(elapsed_time);
                 //----------------------------------------------------------------------------------
                 // Submission data
                 //----------------------------------------------------------------------------------
@@ -119,11 +118,9 @@ public class UpdateRealm {
                 // + Copy to Realm
                 //----------------------------------------------------------------------------------
                 realm.copyToRealmOrUpdate(newReview);
-
             }
             realm.commitTransaction();
             realm.close();
-
         }
     }
 
@@ -188,7 +185,7 @@ public class UpdateRealm {
                 //----------------------------------------------------------------------------------
                 realm.copyToRealmOrUpdate(newFeedback);
                 //----------------------------------------------------------------------------------
-                // Update the project rating
+                // Update the reports_project rating
                 //----------------------------------------------------------------------------------
                 RealmQuery<RealmReview> reviewsQuery = realm.where(RealmReview.class);
                 reviewsQuery.equalTo("id", submission_id);

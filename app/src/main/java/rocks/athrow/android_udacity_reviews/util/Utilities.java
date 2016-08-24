@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utilities
@@ -67,14 +68,14 @@ public final class Utilities {
     }
 
     /**
-     * elapsedTime
-     * Get the elapsed time between two dates
+     * elapsedTimeDisplay
+     * Get the elapsed time between two dates in readable format
      *
      * @param dateStart the date start
      * @param dateEnd   the date end
      * @return the elapsed hours and minutes
      */
-    public static String elapsedTime(Date dateStart, Date dateEnd) {
+    public static String elapsedTimeDisplay(Date dateStart, Date dateEnd) {
         long diff = dateEnd.getTime() - dateStart.getTime();
         long diffMinutes = diff / (60 * 1000) % 60;
         long diffHours = diff / (60 * 60 * 1000);
@@ -84,6 +85,31 @@ public final class Utilities {
         }
         return Long.toString(diffHours) + ":" + mins;
     }
+
+    /**
+     * elapsedMinuted
+     * Get the elapsed minutes between two dates
+     *
+     * @param dateStart the date start
+     * @param dateEnd   the date end
+     * @return the elapsed hours and minutes in a long
+     */
+    public static long elapsedMilliseconds(Date dateStart, Date dateEnd) {
+        return dateEnd.getTime() - dateStart.getTime();
+    }
+
+    /**
+     * millisecondsToHours
+     * Get the hh:mm value from milliseconds
+     * @param millis the milliseconds value
+     * @return a string with the time in hh:mm format
+     */
+    public static String millisecondsToHours(long millis){
+        return String.format(Locale.getDefault(), "%02d:%02d",
+                TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
+    }
+
 
     /**
      * getTodaysDate

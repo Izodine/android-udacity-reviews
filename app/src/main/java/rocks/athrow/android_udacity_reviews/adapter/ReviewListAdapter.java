@@ -95,8 +95,7 @@ public class ReviewListAdapter extends RealmRecyclerViewAdapter<RealmReview> {
         //------------------------------------------------------------------------------------------
         // Get the elapsed time between start/end
         //------------------------------------------------------------------------------------------
-        // TODO: Store this value in the database?
-        final String elapsedTime = Utilities.elapsedTime(assignedAt, completedAt);
+        final String elapsedTime = reviewRecord.getElapsedTimeDisplay();
         //------------------------------------------------------------------------------------------
         // Get the filename from the archive url
         //------------------------------------------------------------------------------------------
@@ -110,8 +109,6 @@ public class ReviewListAdapter extends RealmRecyclerViewAdapter<RealmReview> {
         //------------------------------------------------------------------------------------------
         // Set the views
         //------------------------------------------------------------------------------------------
-
-
         reviewListRecyclerView.viewReviewId.setText(idString);
         reviewListRecyclerView.viewProjectName.setText(projectName);
         reviewListRecyclerView.viewCompletedAt.setText(completedAtListDisplay);
@@ -168,11 +165,9 @@ public class ReviewListAdapter extends RealmRecyclerViewAdapter<RealmReview> {
             }
         });
 
-
     }
-
     /* The inner RealmBaseAdapter
-     * view count is applied here.
+     * view reports_count is applied here.
      *
      * getRealmAdapter is defined in RealmRecyclerViewAdapter.
      */
