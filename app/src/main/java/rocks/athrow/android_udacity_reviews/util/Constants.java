@@ -11,4 +11,6 @@ public final class Constants {
 
     public static final String PREF_REPORT_DATE1 = "date1";
     public static final String PREF_REPORT_DATE2 = "date2";
+
+    public static final int NOTIFICATION_PULLING_ID = 1;
 }
