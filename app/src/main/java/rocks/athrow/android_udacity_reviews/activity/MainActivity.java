@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startService(new Intent(this, ReviewPullerService.class));
         boolean DEBUG = false;
 
         setContentView(R.layout.activity_main);
