@@ -1,7 +1,8 @@
 package rocks.athrow.android_udacity_reviews.data;
 
+import java.util.ArrayList;
+
 import android.net.Uri;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,10 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
 
-import rocks.athrow.android_udacity_reviews.BuildConfig;
 import rocks.athrow.android_udacity_reviews.util.Utilities;
 
 /**
@@ -26,99 +24,94 @@ public final class API {
         throw new AssertionError("No API instances for you!");
     }
 
-    private static final String apiKey = BuildConfig.UDACITY_REVIEWER_API_KEY;
-    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    private static final String MODULE_REVIEWS = "submissions_completed";
-    private static final String MODULE_FEEDBACKS = "student_feedbacks";
-    private static final String REVIEWS_API_URL = "https://review-api.udacity.com/api/v1/me/submissions/completed";
-    private static final String FEEDBACKS_API_URL = "https://review-api.udacity.com/api/v1/me/student_feedbacks";
-
     /**
-     * callAPI
-     *
-     * @param module    the API module (supported: submissions_completed, student_feedbacks)
-     * @param dateStart the start date to retrieve results from
-     * @param dateEnd   the end date to retrieve result to
+     * callReviewsAPI
+     * @param APIKey the API key string
+
      * @return the API response in a string
      */
-    public static String callAPI(String module, Date dateStart, Date dateEnd) {
-        Log.d("module ", module);
-        String APIUrl;
-        if (module.equals(MODULE_REVIEWS)) {
-            APIUrl = REVIEWS_API_URL;
-        } else if (module.equals(MODULE_FEEDBACKS)) {
-            APIUrl = FEEDBACKS_API_URL;
-        } else {
-            return "error: empty module argument";
-        }
-        Log.d("APIUrl ", APIUrl);
-
-        ArrayList<String> params = new ArrayList<>();
+    public static String callReviewsAPI(String APIKey, String dateStart, String dateEnd){
+        String APIUrl = "https://review-api.udacity.com/api/v1/me/submissions/completed";
+        ArrayList<String> paramsArray = new ArrayList<>();
         boolean hasParams = false;
-        if (dateStart != null) {
-            Log.d("dateStart ", "true");
-            params.add("start_date=" + Utilities.getDateAsString(dateStart, DATE_FORMAT, "UTC"));
+        if (dateStart != null && !dateStart.equals("")) {
+            paramsArray.add("start_date=" + dateStart);
             hasParams = true;
         }
-        if (dateEnd != null) {
-            params.add("end_date=" + Utilities.getDateAsString(dateEnd, DATE_FORMAT, "UTC"));
+        if (dateEnd != null && !dateEnd.equals("")) {
+            paramsArray.add("end_date=" + dateEnd);
             hasParams = true;
         }
-        Log.d("url ", APIUrl);
         if (hasParams) {
-            String UrlParams = Utilities.buildStringFromArray(params, "&");
+            String UrlParams = Utilities.buildStringFromArray(paramsArray, "&");
             if (UrlParams != null) {
-                Log.d("urlParams ", UrlParams);
-                Log.d("reviewApiUrl ", REVIEWS_API_URL);
                 APIUrl = APIUrl + "?" + UrlParams;
-                Log.d("API URL ", APIUrl);
             }
-        } else {
-            Log.d("params ", "no params");
         }
-
-        return httpConnect(APIUrl);
+        return httpConnect(APIKey, APIUrl, "GET", "");
+    }
+    /**
+     * callFeedbacksAPI
+     * @param APIKey the API key string
+     *
+     * @return the API response in a string
+     */
+    public static String callFeedbacksAPI(String APIKey, String dateStart, String dateEnd){
+        String APIUrl = "https://review-api.udacity.com/api/v1/me/student_feedbacks";
+        ArrayList<String> paramsArray = new ArrayList<>();
+        boolean hasParams = false;
+        if (dateStart != null && !dateStart.equals("")) {
+            paramsArray.add("start_date=" + dateStart);
+            hasParams = true;
+        }
+        if (dateEnd != null && !dateEnd.equals("")) {
+            paramsArray.add("end_date=" + dateEnd);
+            hasParams = true;
+        }
+        if (hasParams) {
+            String UrlParams = Utilities.buildStringFromArray(paramsArray, "&");
+            if (UrlParams != null) {
+                APIUrl = APIUrl + "?" + UrlParams;
+            }
+        }
+        return httpConnect(APIKey, APIUrl, "GET", "");
     }
 
     /**
      * httpConnect
      * This method handles communicating with the API and converting the input stream into a string
-     *
+     * @param apiKey the API key
+     * @param apiUrl the request url
+     * @param requestMethod the request's method (GET, PUT, DELETE)
+     * @param requestBody the request's body (optional)
      * @return a json string to be used in a parsing method
      */
-    private static String httpConnect(String APIurl) {
+    private static String httpConnect(String apiKey, String apiUrl, String requestMethod, String requestBody) {
         String results = null;
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         try {
-            // Build the URL
-            Uri builtUri = Uri.parse(APIurl).buildUpon().build();
+            Uri builtUri = Uri.parse(apiUrl).buildUpon().build();
             URL url = new URL(builtUri.toString());
-            // Establish the connection
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
+            urlConnection.setRequestMethod(requestMethod);
+            urlConnection.addRequestProperty("Body", requestBody);
             urlConnection.addRequestProperty("Authorization", apiKey);
             urlConnection.addRequestProperty("Content-Length", "0");
             urlConnection.addRequestProperty("Accept", "application/json");
             urlConnection.connect();
-            // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
             StringBuilder buffer = new StringBuilder();
             if (inputStream == null) {
-                // Nothing to do.
                 results = null;
                 return null;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging ->  + "\n"
                 buffer.append(line);
             }
             if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
                 results = null;
             }
             results = buffer.toString();
@@ -136,8 +129,6 @@ public final class API {
                 }
             }
         }
-        Log.i("json ", results);
         return results;
     }
-
 }

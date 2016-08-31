@@ -17,8 +17,9 @@ import io.realm.Sort;
 import rocks.athrow.android_udacity_reviews.R;
 import rocks.athrow.android_udacity_reviews.activity.MainActivity;
 import rocks.athrow.android_udacity_reviews.adapter.ReviewListAdapter;
+import rocks.athrow.android_udacity_reviews.data.FetchFeedbacksTask;
+import rocks.athrow.android_udacity_reviews.data.FetchReviewsTask;
 import rocks.athrow.android_udacity_reviews.util.Utilities;
-import rocks.athrow.android_udacity_reviews.data.FetchTask;
 import rocks.athrow.android_udacity_reviews.data.RealmReview;
 import rocks.athrow.android_udacity_reviews.realmadapter.RealmReviewsAdapter;
 
@@ -27,14 +28,11 @@ import rocks.athrow.android_udacity_reviews.realmadapter.RealmReviewsAdapter;
  * Created by josel on 7/5/2016.
  */
 public class ReviewsListActivityFragment extends android.support.v4.app.Fragment implements MainActivity.ReviewsListFragmentCallback {
-
-    private final String MODULE_REVIEWS = "submissions_completed";
-    private final String MODULE_FEEDBACKS = "student_feedbacks";
     private final String MODULE_COMPLETED_AT = "completed_at";
     private ReviewListAdapter reviewListAdapter;
     private SwipeRefreshLayout swipeContainer;
-    private FetchTask fetchReviews;
-    private FetchTask fetchFeedbacks;
+    private FetchReviewsTask fetchReviews;
+    private FetchFeedbacksTask fetchFeedbacks;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,10 +53,15 @@ public class ReviewsListActivityFragment extends android.support.v4.app.Fragment
         // with a callBack to remove itself and present a toast when finishing the FetchReviews task
         final MainActivity.ReviewsListFragmentCallback callback = new MainActivity.ReviewsListFragmentCallback() {
             @Override
-            public void onFetchReviewsCompleted() {
+            public void onFetchReviewsCompleted(int result) {
                 swipeContainer.setRefreshing(false);
-
-                CharSequence text = context.getString(R.string.review_detail_label_reviews_to_date);
+                CharSequence text;
+                if ( result == -1 ){
+                    text = context.getString(R.string.review_list_bad_server_response);
+                }
+                else{
+                    text = context.getString(R.string.review_list_bad_reviews_up_to_date);
+                }
                 int duration = Toast.LENGTH_SHORT;
                 final Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
@@ -70,9 +73,9 @@ public class ReviewsListActivityFragment extends android.support.v4.app.Fragment
             public void onRefresh() {
                 boolean isConnected = Utilities.isConnected(getContext());
                 if (isConnected) {
-                    fetchReviews = new FetchTask(getContext(), MODULE_REVIEWS, reviewListAdapter, callback);
+                    fetchReviews = new FetchReviewsTask(getContext(), reviewListAdapter, callback);
                     fetchReviews.execute();
-                    fetchFeedbacks = new FetchTask(getContext(), MODULE_FEEDBACKS, null, null);
+                    fetchFeedbacks = new FetchFeedbacksTask(getContext(), reviewListAdapter, null);
                     fetchFeedbacks.execute();
                 } else {
                     CharSequence text = context.getString(R.string.general_no_network_connection);
@@ -127,7 +130,7 @@ public class ReviewsListActivityFragment extends android.support.v4.app.Fragment
     }
 
     @Override
-    public void onFetchReviewsCompleted() {
+    public void onFetchReviewsCompleted(int result) {
 
     }
 }

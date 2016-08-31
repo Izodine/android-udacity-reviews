@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/report_body"
-    android:layout_marginTop="16dp"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:showIn="@layout/fragment_reports">
-
+    android:layout_marginTop="16dp"
+    android:orientation="vertical"
+    android:visibility="gone">
+	
     <include layout="@layout/project_item_headers" />
 
     <android.support.v7.widget.RecyclerView
