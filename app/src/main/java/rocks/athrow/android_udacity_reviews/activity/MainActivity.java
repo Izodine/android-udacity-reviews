@@ -20,6 +20,7 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import rocks.athrow.android_udacity_reviews.R;
 import rocks.athrow.android_udacity_reviews.adapter.TabNavigationAdapter;
+import rocks.athrow.android_udacity_reviews.service.ReviewPullerService;
 import rocks.athrow.android_udacity_reviews.util.Constants;
 import rocks.athrow.android_udacity_reviews.util.Utilities;
 
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startService(new Intent(this, ReviewPullerService.class));
         boolean DEBUG = false;
 
         setContentView(R.layout.activity_main);

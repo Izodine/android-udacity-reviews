@@ -33,4 +33,7 @@
     <!--Report Fragment: Other -->
     <string name="reports_invalid_date_range">Invalid date range!</string>
     <string name="reports_no_reviews_found">No reviews found for this period.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

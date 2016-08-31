@@ -3,5 +3,6 @@
     <string-array name="nav_items">
         <item>Reviews</item>
         <item>Reports</item>
+        <item>Pulling</item>
     </string-array>
 </resources>
